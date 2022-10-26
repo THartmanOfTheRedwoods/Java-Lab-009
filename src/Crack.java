@@ -1,5 +1,6 @@
 import org.apache.commons.codec.digest.Crypt;
 
+import javax.sound.sampled.Line;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,6 +21,22 @@ public class Crack {
     }
 
     public void crack() throws FileNotFoundException {
+        FileInputStream fis = new FileInputStream("resources/englishSmall.dic");
+
+        Scanner s = new Scanner(fis);
+        int i = 0;
+        while(s.hasNextLine()) {
+            String word = s.nextLine();
+
+            for(User u : users) {
+                if(u.getPassHash().contains("$")) {
+                    String hash = Crypt.crypt(word, u.getPassHash());
+                    if (hash.equals(u.getPassHash())) {
+                        System.out.println("Password found: " + word + " for user " + u.getUsername());
+                    }
+                }
+            }
+        }
     }
 
     public static int getLineCount(String path) {
@@ -31,6 +48,19 @@ public class Crack {
     }
 
     public static User[] parseShadow(String shadowFile) throws FileNotFoundException {
+        User[] users = new User[getLineCount(shadowFile)];
+        FileInputStream fis = new FileInputStream("resources/shadow");
+
+        Scanner s = new Scanner(fis);
+        int i = 0;
+        while(s.hasNextLine()) {
+            String line = s.nextLine();
+            String[] splitLine = line.split(":");
+            User u = new User(splitLine[0], splitLine[1]);
+            users[i] = u;
+            i++;
+        }
+        return users;
     }
 
     public static void main(String[] args) throws FileNotFoundException {
