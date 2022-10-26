@@ -24,6 +24,7 @@ public class Crack {
 
         FileInputStream fir = new FileInputStream(this.dictionary); //imported class FileInputStream
         Scanner s = new Scanner(fir); //imported class Scanner
+
         //a while loop that uses the above 2 imported classes to read the **resources/shadow** file line by line
         while(s.hasNextLine()) {
             String word = s.nextLine();
