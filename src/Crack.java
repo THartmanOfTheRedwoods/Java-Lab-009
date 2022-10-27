@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -19,7 +20,32 @@ public class Crack {
         this.users = Crack.parseShadow(shadowFile);
     }
 
-    public void crack() throws FileNotFoundException {
+    public void crack(String dictionary) throws FileNotFoundException {
+        FileInputStream FIn = new FileInputStream(dictionary);
+        Scanner s = new Scanner(FIn);
+
+        while(s.hasNextLine()){
+            String word = s.nextLine();
+            int i = 0;
+//            System.out.println("First while");//TEST   DELETE
+
+            while (i < users.length) {
+
+//                System.out.println("2nd while  "+i);//TEST   DELETE
+
+                if ((users[i].getPassHash()).contains("$")){
+                    String hash = Crypt.crypt(word , users[i].getPassHash());
+
+ //                   System.out.println(users[i].getUsername()+"   "+users[i].getPassHash());//TEST   DELETE
+
+                    if (hash.equals(users[i].getPassHash())) {
+                        System.out.println("Found password " + word + " for user " + users[i].getUsername());
+                    }
+                }
+//                System.out.println("End 2st while\n");
+                i++;
+            }
+        }
     }
 
     public static int getLineCount(String path) {
@@ -31,6 +57,21 @@ public class Crack {
     }
 
     public static User[] parseShadow(String shadowFile) throws FileNotFoundException {
+        FileInputStream FIn = new FileInputStream(shadowFile);
+        Scanner s = new Scanner(FIn);
+        User[] users = new User[getLineCount(shadowFile)];
+
+        int i = 0;
+        while(getLineCount(shadowFile) > i){
+            String line = s.nextLine();
+            User u = new User(line.split(":")[0], line.split(":")[1]);
+            users[i] = u;
+            i++;
+        }
+        return users;
+
+
+
     }
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -41,6 +82,6 @@ public class Crack {
         String dictPath = sc.nextLine();
 
         Crack c = new Crack(shadowPath, dictPath);
-        c.crack();
+        c.crack(dictPath);
     }
 }
